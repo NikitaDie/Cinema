@@ -1,3 +1,4 @@
+using Cinema.Core;
 using Cinema.Core.Interfaces;
 using Cinema.Core.Services;
 using Cinema.Storage;
@@ -19,7 +20,8 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Local")));
-    
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
     
 builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IMovieService, MovieService>();
@@ -43,16 +45,21 @@ var app = builder.Build();
 app.UseCors("AllowFrontend");
 
 // Configure Static File Middleware
-var uploadsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "public");
+var uploadsDirectory = Path.Combine(Directory.GetCurrentDirectory(), builder.Configuration["UploadsDirectory"] ?? "public");
 
-app.UseStaticFiles();  // Enables serving static files from wwwroot by default
+if (!Directory.Exists(uploadsDirectory))
+{
+    Directory.CreateDirectory(uploadsDirectory);
+}
 
 // Serve files from the "UploadedFiles" directory
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(uploadsDirectory),
-    RequestPath = "/uploaded-files" // The URL route to access the files
+    RequestPath = "/uploads" // The URL route to access the files
 });
+
+app.UseStaticFiles();  // Enables serving static files from wwwroot by default
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

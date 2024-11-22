@@ -16,11 +16,24 @@ public class MovieController : ControllerBase
         _movieService = movieService;
     }
     
+    //Get api/movies/{id}
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetMovieDetails(int id)
+    {
+        var result = await _movieService.GetMovieDetails(id);
+        return result.IsSuccess
+            ? Ok(result)
+            : NotFound(result.Error);
+    }
+    
     // GET: api/movies
     [HttpGet]
     public async Task<IActionResult> GetAllCurrentMovies()
     {
-        return Ok(await _movieService.GetAllCurrentMovies());
+        var result = await _movieService.GetAllCurrentMovies();
+        return result.IsSuccess
+            ? Ok(result)
+            : NotFound(result.Error);
     }
     
     // POST: api/movies
@@ -33,13 +46,11 @@ public class MovieController : ControllerBase
         }
 
         var result = await _movieService.CreateMovie(createMovieDto);
-
-        if (!result.IsSuccess)
-        {
-            return StatusCode((int)result.StatusCode, result.Message);
-        }
-
-        return CreatedAtAction(nameof(GetAllCurrentMovies), new { id = result.MovieId }, result);
+        var createdMovieId = result.Data?.Id;
+        
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetMovieDetails), new { id = createdMovieId }, result)
+            : BadRequest(result.Error);
     }
     
 }

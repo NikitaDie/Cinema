@@ -36,8 +36,9 @@ public class CreateMovieDto
     [StringLength(50, ErrorMessage = "Language cannot exceed 50 characters.")]
     public string Language { get; set; }
 
-    [Required]
-    public List<string> Genres { get; set; }
+    [Required(ErrorMessage = "Genres are required.")]
+    [MinLength(1, ErrorMessage = "At least one genre ID must be specified.")]
+    public List<Guid> Genres { get; set; }
 
     [Required(ErrorMessage = "Duration is required.")]
     [Range(typeof(TimeSpan), "00:01", "23:59", ErrorMessage = "Duration must be between 1 minute and 23 hours 59 minutes.")]
@@ -52,7 +53,7 @@ public class CreateMovieDto
     [StringLength(200, ErrorMessage = "Screenplay cannot exceed 200 characters.")]
     public string? Screenplay { get; set; }
     
-    public List<string>? Starring { get; set; }
+    public List<Guid>? Starring { get; set; }
 
     [StringLength(200, ErrorMessage = "Inclusive adaptation details cannot exceed 200 characters.")]
     public string? InclusiveAdaptation { get; set; }
@@ -67,7 +68,7 @@ public class CreateMovieDto
     [Required(ErrorMessage = "Image is required.")]
     public IFormFile Image { get; set; }
     
-    public ServiceResult Validate()
+    public List<string> Validate()
     {
         var errors = new List<string>();
 
@@ -81,9 +82,6 @@ public class CreateMovieDto
             errors.Add("Year must be a valid year.");
 
         // Validate rental period
-        if (RentalPeriodStart == null || RentalPeriodEnd == null)
-            errors.Add("Rental period start and end dates are required.");
-
         if (RentalPeriodStart >= RentalPeriodEnd)
             errors.Add("Rental period start date must be before the end date.");
 
@@ -94,9 +92,7 @@ public class CreateMovieDto
         if (!string.IsNullOrEmpty(TrailerLink) && !Uri.IsWellFormedUriString(TrailerLink, UriKind.Absolute))
             errors.Add("Trailer link must be a valid URL.");
 
-        return errors.Count > 0 ? new ServiceResult(false, string.Join(",", errors))
-            : new ServiceResult(true);
-
+        return errors;
     }
     
     

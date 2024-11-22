@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Cinema.Core.DTOs;
 
-namespace Cinema.Core.Models;
-
-public partial class Movie
+public class MovieDetailsDto
 {
-    public Guid Id { get; set; }
-
     public string Title { get; set; } = null!;
     
     public string? OriginalTitle { get; set; }
@@ -22,6 +17,8 @@ public partial class Movie
     public DateTime RentalPeriodEnd { get; set; }
     
     public string Language { get; set; }
+    
+    public string Genres { get; set; }
 
     public TimeSpan Duration { get; set; }
     
@@ -31,6 +28,8 @@ public partial class Movie
     
     public string? Screenplay { get; set; }
     
+    public string? Starring { get; set; }
+    
     public string? InclusiveAdaptation { get; set; }
     
     public string? Description { get; set; }
@@ -38,10 +37,4 @@ public partial class Movie
     public string TrailerLink { get; set; }
     
     public string ImagePath { get; set; }
-
-    public virtual ICollection<Genre> Genres { get; set; } = new List<Genre>();
-    
-    public virtual ICollection<Actor> Starring { get; set; } = new List<Actor>();
-    
-    public virtual ICollection<Session> Sessions { get; set; } = new List<Session>();
 }

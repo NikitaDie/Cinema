@@ -153,11 +153,6 @@ public partial class AppDbContext : DbContext
                 .IsRequired()
                 .HasColumnName("language");
 
-            entity.Property(e => e.Genres)
-                .HasMaxLength(255)
-                .IsRequired() 
-                .HasColumnName("genres");
-
             entity.Property(e => e.Duration)
                 .HasColumnType("interval")
                 .IsRequired()
@@ -177,11 +172,6 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(255)
                 .IsRequired(false)
                 .HasColumnName("screenplay");
-
-            entity.Property(e => e.Starring)
-                .HasMaxLength(255)
-                .IsRequired(false)
-                .HasColumnName("starring");
 
             entity.Property(e => e.InclusiveAdaptation)
                 .HasMaxLength(255)
@@ -203,11 +193,74 @@ public partial class AppDbContext : DbContext
                 .IsRequired()
                 .HasColumnName("image_path");
 
+            entity.HasMany(m => m.Genres)
+                .WithMany(g => g.Movies)
+                .UsingEntity(
+                    "MovieGenre",
+                    l => l.HasOne(typeof(Genre))
+                        .WithMany()
+                        .HasForeignKey("GenreId")
+                        .HasPrincipalKey(nameof(Genre.Id)),
+                    j => j.HasOne(typeof(Movie))
+                        .WithMany()
+                        .HasForeignKey("MovieId")
+                        .HasPrincipalKey(nameof(Movie.Id)),
+                    j =>
+                    {
+                        j.HasKey("MovieId", "GenreId");
+                        j.HasIndex("MovieId", "GenreId").IsUnique();
+                    }
+                );
+            
+            entity.HasMany(m => m.Starring)
+                .WithMany(s => s.Movies)
+                .UsingEntity(
+                    "MovieActor",
+                    l => l.HasOne(typeof(Actor))
+                        .WithMany()
+                        .HasForeignKey("ActorId")
+                        .HasPrincipalKey(nameof(Actor.Id)),
+                    j => j.HasOne(typeof(Movie))
+                        .WithMany()
+                        .HasForeignKey("MovieId")
+                        .HasPrincipalKey(nameof(Movie.Id)),
+                    j =>
+                    {
+                        j.HasKey("MovieId", "ActorId");
+                        j.HasIndex("MovieId", "ActorId").IsUnique();
+                    }
+                );
+            
+            entity.HasMany(m => m.Starring)
+                .WithMany(g => g.Movies);
+
             entity.HasMany(e => e.Sessions)
                 .WithOne(e => e.Movie)
                 .HasForeignKey(e => e.MovieId);
         });
 
+        modelBuilder.Entity<Genre>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("genres_pkey");
+            entity.ToTable("genres");
+
+            entity.Property(e => e.Name)
+                .HasMaxLength(255)
+                .IsRequired()
+                .HasColumnName("name");
+        });
+
+        modelBuilder.Entity<Actor>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("actors_pkey");
+            entity.ToTable("actors");
+
+            entity.Property(e => e.Name)
+                .HasMaxLength(255)
+                .IsRequired()
+                .HasColumnName("name");
+        });
+        
         modelBuilder.Entity<Pricelist>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("pricelist_pkey");

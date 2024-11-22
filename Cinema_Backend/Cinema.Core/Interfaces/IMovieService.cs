@@ -6,7 +6,8 @@ namespace Cinema.Core.Interfaces;
 
 public interface IMovieService
 {
-    public Task<IEnumerable<Movie>> GetAllCurrentMovies();
+    public Task<Result<ICollection<Movie>>> GetAllCurrentMovies();
     
-    Task<ServiceResult> CreateMovie(CreateMovieDto createMovieDto);
+    Task<Result<Movie>> CreateMovie(CreateMovieDto createMovieDto);
+    Task<Result<MovieDetailsDto>> GetMovieDetails(int id);
 }
