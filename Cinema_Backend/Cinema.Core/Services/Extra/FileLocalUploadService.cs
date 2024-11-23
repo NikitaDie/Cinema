@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Cinema.Core.Services.Extra;
 
-public class FileUploadService : IFileUploadService
+public class FileLocalUploadService : IFileUploadService
 {
     private static readonly int _maxFileSizeMB = 25;
     private static readonly string[] _allowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp"];

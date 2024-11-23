@@ -136,7 +136,7 @@ public class MovieServiceTests
 
         // Seed data in the in-memory database
         await _repository.AddAsync(new Genre { Id = genreId, Name = "Action" });
-        await _repository.AddAsync(new Actor { Id = actorId, Name = "Actor 1" });
+        await _repository.AddAsync(new Actor { Id = actorId, FirstName = "Actor", LastName = "1"});
         await _repository.SaveChangesAsync();
 
         var createMovieDto = new CreateMovieDto

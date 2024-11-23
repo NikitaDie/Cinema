@@ -18,7 +18,7 @@ public class MovieController : ControllerBase
     
     //Get api/movies/{id}
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetMovieDetails(int id)
+    public async Task<IActionResult> GetMovieDetails(Guid id)
     {
         var result = await _movieService.GetMovieDetails(id);
         return result.IsSuccess

@@ -4,7 +4,6 @@ using Cinema.Core.Helpers;
 using Cinema.Core.Interfaces;
 using Cinema.Core.Interfaces.Extra;
 using Cinema.Core.Models;
-using Cinema.Core.Services.Extra;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -26,19 +25,36 @@ public class MovieService : IMovieService
         _uploadsDirectory = Path.Combine(Directory.GetCurrentDirectory(), configuration["UploadsDirectory"] ?? "public");
     }
     
-    public Task<Result<MovieDetailsDto>> GetMovieDetails(int id)
+    public async Task<Result<MovieDetailsDto>> GetMovieDetails(Guid id)
     {
-        throw new NotImplementedException();
+        var movie = await _repository.GetAll<Movie>()
+            .Include(m => m.Genres)
+            .Include(m => m.Starring)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(m => m.Id == id);
+        
+        if (movie == null)
+        {
+            return Result.Failure<MovieDetailsDto>("Movie not found.");
+        }
+        
+        var movieDetailsDto = _mapper.Map<MovieDetailsDto>(movie);
+        
+        // movieDetailsDto.Genres = movie.Genres.Select(g => g.Name).ToList();
+        // movieDetailsDto.Starring = movie.Starring.Select(a => $"{a.FirstName} {a.LastName}").ToList();
+        
+        return Result.Success(movieDetailsDto);
     }
     
-    public async Task<Result<ICollection<Movie>>> GetAllCurrentMovies()
+    public async Task<Result<ICollection<MovieMinimalDto>>> GetAllCurrentMovies()
     {
         // "current" means movies where rental period is still active
-        var movies = _repository.GetAll<Movie>();
+        var movies = _repository.GetAll<Movie>().AsNoTracking();
         var currentMovies = movies.Where(m => m.RentalPeriodEnd > DateTime.UtcNow);
         
         var resultList = await currentMovies.ToListAsync();
-        return Result.Success((ICollection<Movie>)resultList);
+        var mappedResultList = _mapper.Map<ICollection<MovieMinimalDto>>(resultList);
+        return Result.Success(mappedResultList);
     }
 
     public async Task<Result<Movie>> CreateMovie(CreateMovieDto createMovieDto)

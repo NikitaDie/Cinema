@@ -248,6 +248,9 @@ public partial class AppDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("genres_pkey");
             entity.ToTable("genres");
 
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .IsRequired()
@@ -259,10 +262,17 @@ public partial class AppDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("actors_pkey");
             entity.ToTable("actors");
 
-            entity.Property(e => e.Name)
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.FirstName)
                 .HasMaxLength(255)
                 .IsRequired()
-                .HasColumnName("name");
+                .HasColumnName("first_name");
+            entity.Property(e => e.LastName)
+                .HasMaxLength(255)
+                .IsRequired()
+                .HasColumnName("last_name");
         });
         
         modelBuilder.Entity<Pricelist>(entity =>

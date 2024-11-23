@@ -1,4 +1,6 @@
-﻿namespace Cinema.Core.DTOs;
+﻿using Cinema.Core.Models;
+
+namespace Cinema.Core.DTOs;
 
 public class MovieDetailsDto
 {
@@ -18,7 +20,7 @@ public class MovieDetailsDto
     
     public string Language { get; set; }
     
-    public string Genres { get; set; }
+    public List<GetGenreDto> Genres { get; set; }
 
     public TimeSpan Duration { get; set; }
     
@@ -28,7 +30,7 @@ public class MovieDetailsDto
     
     public string? Screenplay { get; set; }
     
-    public string? Starring { get; set; }
+    public List<GetActorDto> Starring { get; set; }
     
     public string? InclusiveAdaptation { get; set; }
     
@@ -36,5 +38,5 @@ public class MovieDetailsDto
 
     public string TrailerLink { get; set; }
     
-    public string ImagePath { get; set; }
+    public string ImageUri { get; set; }
 }

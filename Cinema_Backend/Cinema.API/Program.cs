@@ -1,6 +1,8 @@
 using Cinema.Core;
 using Cinema.Core.Interfaces;
+using Cinema.Core.Interfaces.Extra;
 using Cinema.Core.Services;
+using Cinema.Core.Services.Extra;
 using Cinema.Storage;
 using Cinema.Storage.Contexts;
 using Microsoft.AspNetCore.Authentication;
@@ -24,6 +26,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddAutoMapper(typeof(MappingProfile));
     
 builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<IFileUploadService, FileLocalUploadService>();
 builder.Services.AddScoped<IMovieService, MovieService>();
 // builder.Services.AddScoped<IUserService, UserService>();
 
