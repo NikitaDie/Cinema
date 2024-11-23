@@ -22,6 +22,10 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Movie> Movies { get; set; }
 
+    public virtual DbSet<Genre> Genres { get; set; }
+    
+    public virtual DbSet<Actor> Actors { get; set; }
+
     public virtual DbSet<Pricelist> Pricelists { get; set; }
 
     public virtual DbSet<Seat> Seats { get; set; }

@@ -2,7 +2,9 @@
 using Cinema.Core.DTOs;
 using Cinema.Core.Helpers;
 using Cinema.Core.Interfaces;
+using Cinema.Core.Interfaces.Extra;
 using Cinema.Core.Models;
+using Cinema.Core.Services.Extra;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,13 +14,15 @@ namespace Cinema.Core.Services;
 public class MovieService : IMovieService
 {
     private readonly string _uploadsDirectory;
-    private readonly IRepository _repository;
     private readonly IMapper _mapper;
+    private readonly IRepository _repository;
+    private readonly IFileUploadService _fileUploadService;
 
-    public MovieService(IRepository repository, IConfiguration configuration, IMapper mapper)
+    public MovieService(IRepository repository, IConfiguration configuration, IMapper mapper, IFileUploadService fileUploadService)
     {
         _mapper = mapper;
         _repository = repository;
+        _fileUploadService = fileUploadService;
         _uploadsDirectory = Path.Combine(Directory.GetCurrentDirectory(), configuration["UploadsDirectory"] ?? "public");
     }
     
@@ -92,7 +96,7 @@ public class MovieService : IMovieService
         try
         {
             var uploadDirectory = Path.Combine(_uploadsDirectory, "movies");
-            var filePath = await FileUploadService.UploadFile(image, uploadDirectory);
+            var filePath = await _fileUploadService.UploadFile(image, uploadDirectory);
             return Result.Success(filePath);
         }
         catch (Exception e)

@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Cinema.Core.Interfaces.Extra;
+using Microsoft.AspNetCore.Http;
 
-namespace Cinema.Core.Services;
+namespace Cinema.Core.Services.Extra;
 
-public static class FileUploadService
+public class FileUploadService : IFileUploadService
 {
     private static readonly int _maxFileSizeMB = 25;
     private static readonly string[] _allowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp"];
@@ -17,7 +18,7 @@ public static class FileUploadService
         return uniqueFileName;
     }
     
-    public static async Task<string> UploadFile(IFormFile file, string uploadDirectory)
+    public async Task<string> UploadFile(IFormFile file, string uploadDirectory)
     {
         ValidateFile(file);
         

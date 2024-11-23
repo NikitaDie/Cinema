@@ -75,10 +75,10 @@ public class CreateMovieDto
         if (string.IsNullOrWhiteSpace(Title))
             errors.Add("Movie name is required.");
 
-        if (AgeRating <= 0)
-            errors.Add("Rating must be a positive number.");
+        if (AgeRating < 1 || AgeRating > 18)
+            errors.Add("Rating must be a valid age restriction (1-18).");
 
-        if (ReleaseYear <= 1900 || ReleaseYear > DateTime.UtcNow.Year)
+        if (ReleaseYear < 1888 || ReleaseYear > DateTime.UtcNow.Year)
             errors.Add("Year must be a valid year.");
 
         // Validate rental period
@@ -91,7 +91,7 @@ public class CreateMovieDto
         // Validate trailer link URL (if present)
         if (!string.IsNullOrEmpty(TrailerLink) && !Uri.IsWellFormedUriString(TrailerLink, UriKind.Absolute))
             errors.Add("Trailer link must be a valid URL.");
-
+        
         return errors;
     }
     
