@@ -14,8 +14,9 @@ using Moq;
 
 namespace Cinema.Tests.UnitTests;
 
-public class MovieServiceTests
+public class MovieServiceTests : IDisposable
 {
+    private readonly AppDbContext _dbContext;
     private readonly IRepository _repository;
     private readonly IMapper _mapper;
     private readonly Mock<IConfiguration> _mockConfiguration;
@@ -25,29 +26,26 @@ public class MovieServiceTests
     public MovieServiceTests()
     {
         // Create the AutoMapper configuration and get the mapper instance
-        var configuration = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile<MappingProfile>();
-        });
+        var configuration = new MapperConfiguration(cfg => { cfg.AddProfile<MappingProfile>(); });
 
         _mapper = configuration.CreateMapper();
-        
+
         // Set up EF Core InMemory Database
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) // Unique database for isolation
             .Options;
 
-        var dbContext = new AppDbContext(options);
+        _dbContext = new AppDbContext(options);
 
         // Create repository using the in-memory database
-        _repository = new Repository(dbContext);
-        
+        _repository = new Repository(_dbContext);
+
         _mockConfiguration = new Mock<IConfiguration>();
         _mockFileUploadService = new Mock<IFileUploadService>();
 
         _mockConfiguration.Setup(c => c["UploadsDirectory"]).Returns("uploads");
 
-       
+
         _movieService = new MovieService(
             _repository,
             _mockConfiguration.Object,
@@ -55,7 +53,7 @@ public class MovieServiceTests
             _mockFileUploadService.Object
         );
     }
-  
+
     // [Fact]
     // public async Task ValidationFails_ReturnsFailure()
     // {
@@ -136,7 +134,7 @@ public class MovieServiceTests
 
         // Seed data in the in-memory database
         await _repository.AddAsync(new Genre { Id = genreId, Name = "Action" });
-        await _repository.AddAsync(new Actor { Id = actorId, FirstName = "Actor", LastName = "1"});
+        await _repository.AddAsync(new Actor { Id = actorId, FirstName = "Actor", LastName = "1" });
         await _repository.SaveChangesAsync();
 
         var createMovieDto = new CreateMovieDto
@@ -168,5 +166,12 @@ public class MovieServiceTests
         Assert.True(result.IsSuccess);
         Assert.Equal("Test Movie", result.Data?.Title);
         Assert.Equal("http://localhost:5054/uploads/ath/image.jpg", result.Data?.ImageUri);
+    }
+
+    public void Dispose()
+    {
+        // Cleanup database state after each test
+        _dbContext.Database.EnsureDeleted();
+        _dbContext.Dispose();
     }
 }
