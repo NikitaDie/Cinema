@@ -1,45 +1,21 @@
-﻿using AutoMapper;
-using Cinema.Core;
-using Cinema.Core.DTOs;
-using Cinema.Core.Interfaces;
+﻿using Cinema.Core.DTOs;
 using Cinema.Core.Interfaces.Extra;
 using Cinema.Core.Models;
 using Cinema.Core.Services;
-using Cinema.Storage;
-using Cinema.Storage.Contexts;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
 namespace Cinema.Tests.UnitTests;
 
-public class MovieServiceTests : IDisposable
+public class MovieServiceTests : TestConfiguration
 {
-    private readonly AppDbContext _dbContext;
-    private readonly IRepository _repository;
-    private readonly IMapper _mapper;
     private readonly Mock<IConfiguration> _mockConfiguration;
     private readonly Mock<IFileUploadService> _mockFileUploadService;
     private readonly MovieService _movieService;
 
     public MovieServiceTests()
     {
-        // Create the AutoMapper configuration and get the mapper instance
-        var configuration = new MapperConfiguration(cfg => { cfg.AddProfile<MappingProfile>(); });
-
-        _mapper = configuration.CreateMapper();
-
-        // Set up EF Core InMemory Database
-        var options = new DbContextOptionsBuilder<AppDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString()) // Unique database for isolation
-            .Options;
-
-        _dbContext = new AppDbContext(options);
-
-        // Create repository using the in-memory database
-        _repository = new Repository(_dbContext);
-
         _mockConfiguration = new Mock<IConfiguration>();
         _mockFileUploadService = new Mock<IFileUploadService>();
 
@@ -47,9 +23,9 @@ public class MovieServiceTests : IDisposable
 
 
         _movieService = new MovieService(
-            _repository,
+            Repository,
             _mockConfiguration.Object,
-            _mapper,
+            Mapper,
             _mockFileUploadService.Object
         );
     }
@@ -133,9 +109,9 @@ public class MovieServiceTests : IDisposable
         var actorId = Guid.NewGuid();
 
         // Seed data in the in-memory database
-        await _repository.AddAsync(new Genre { Id = genreId, Name = "Action" });
-        await _repository.AddAsync(new Actor { Id = actorId, FirstName = "Actor", LastName = "1" });
-        await _repository.SaveChangesAsync();
+        await Repository.AddAsync(new Genre { Id = genreId, Name = "Action" });
+        await Repository.AddAsync(new Actor { Id = actorId, FirstName = "Actor", LastName = "1" });
+        await Repository.SaveChangesAsync();
 
         var createMovieDto = new CreateMovieDto
         {
@@ -157,7 +133,7 @@ public class MovieServiceTests : IDisposable
         _mockFileUploadService.Setup(f => f.UploadFile(It.IsAny<IFormFile>(), It.IsAny<string>()))
             .ReturnsAsync("test/path/image.jpg");
 
-        var movie = _mapper.Map<Movie>(createMovieDto);
+        var movie = Mapper.Map<Movie>(createMovieDto);
 
         // Act
         var result = await _movieService.CreateMovie(createMovieDto);
@@ -171,7 +147,7 @@ public class MovieServiceTests : IDisposable
     public void Dispose()
     {
         // Cleanup database state after each test
-        _dbContext.Database.EnsureDeleted();
-        _dbContext.Dispose();
+        DbContext.Database.EnsureDeleted();
+        DbContext.Dispose();
     }
 }
