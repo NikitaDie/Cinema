@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Cinema.Core.DTOs.Auditorium;
 
-namespace Cinema.Core.Models;
+namespace Cinema.Core.DTOs.Branch;
 
-public partial class Branch
+public class GetBranchDto
 {
     public Guid Id { get; set; }
 
@@ -19,7 +18,5 @@ public partial class Branch
     
     public string PhoneNumber { get; set; } = null!;
     
-    public bool IsDeleted { get; set; }
-
-    public virtual ICollection<Auditorium> Auditoriums { get; set; } = new List<Auditorium>();
+    public virtual ICollection<AuditoriumMinimalDto> Auditoriums { get; set; } = new List<AuditoriumMinimalDto>();
 }

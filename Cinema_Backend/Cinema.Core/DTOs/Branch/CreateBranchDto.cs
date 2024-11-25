@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Cinema.Core.Helpers.Validation;
 
-namespace Cinema.Core.Models;
+namespace Cinema.Core.DTOs.Branch;
 
-public partial class Branch
+public class CreateBranchDto : BaseValidationModel<CreateBranchDto>
 {
-    public Guid Id { get; set; }
-
     public string Name { get; set; } = null!;
 
     public string Address { get; set; } = null!;
@@ -18,8 +15,4 @@ public partial class Branch
     public string ZipCode { get; set; } = null!;
     
     public string PhoneNumber { get; set; } = null!;
-    
-    public bool IsDeleted { get; set; }
-
-    public virtual ICollection<Auditorium> Auditoriums { get; set; } = new List<Auditorium>();
 }

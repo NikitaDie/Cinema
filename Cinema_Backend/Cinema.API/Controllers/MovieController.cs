@@ -1,6 +1,5 @@
 ﻿using Cinema.Core.DTOs;
 using Cinema.Core.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cinema_Backend.Controllers;
@@ -17,7 +16,7 @@ public class MovieController : ControllerBase
     }
     
     //Get api/movies/{id}
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetMovieDetails(Guid id)
     {
         var result = await _movieService.GetMovieDetails(id);
@@ -40,10 +39,10 @@ public class MovieController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateMovie([FromForm] CreateMovieDto createMovieDto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
+        // if (!ModelState.IsValid)
+        // {
+        //     return BadRequest(ModelState);
+        // }
 
         var result = await _movieService.CreateMovie(createMovieDto);
         var createdMovieId = result.Data?.Id;

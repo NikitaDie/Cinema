@@ -73,9 +73,35 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
+            
             entity.Property(e => e.Name)
+                .IsRequired()
                 .HasMaxLength(255)
                 .HasColumnName("name");
+            entity.Property(e => e.Address)
+                .IsRequired()
+                .HasMaxLength(255) // Adjust length if needed
+                .HasColumnName("address");
+            entity.Property(e => e.City)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("city");
+            entity.Property(e => e.Region)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("region");
+            entity.Property(e => e.ZipCode)
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasColumnName("zip_code");
+            entity.Property(e => e.PhoneNumber)
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasColumnName("phone_number");
+            entity.Property(e => e.IsDeleted)
+                .IsRequired()
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
         });
 
         modelBuilder.Entity<Client>(entity =>
@@ -143,12 +169,12 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("director");
 
             entity.Property(e => e.RentalPeriodStart)
-                .HasColumnType("timestamp with time zone")
+                .HasColumnType("date")
                 .IsRequired()
                 .HasColumnName("rental_period_start");
 
             entity.Property(e => e.RentalPeriodEnd)
-                .HasColumnType("timestamp with time zone")
+                .HasColumnType("date")
                 .IsRequired() 
                 .HasColumnName("rental_period_end");
 

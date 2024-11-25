@@ -17,9 +17,9 @@ public partial class Movie
     
     public string Director { get; set; }
     
-    public DateTime RentalPeriodStart { get; set; }
+    public DateOnly RentalPeriodStart { get; set; }
     
-    public DateTime RentalPeriodEnd { get; set; }
+    public DateOnly RentalPeriodEnd { get; set; }
     
     public string Language { get; set; }
 

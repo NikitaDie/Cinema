@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Cinema.Core.DTOs;
+using Cinema.Core.DTOs.Branch;
 using Cinema.Core.Models;
 
 namespace Cinema.Core;
@@ -23,6 +24,12 @@ public class MappingProfile : Profile
         
         CreateMap<Actor, GetActorDto>()
             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName));
+
+        //Branch
+        CreateMap<CreateBranchDto, Branch>();
+        CreateMap<Branch, GetBranchDto>();
+        CreateMap<UpdateBranchDto, Branch>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
     }
     
     private string MapImageUri(string imagePath) //todo: unify

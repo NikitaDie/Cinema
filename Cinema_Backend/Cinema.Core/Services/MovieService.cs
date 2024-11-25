@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Cinema.Core.DTOs;
 using Cinema.Core.Helpers;
+using Cinema.Core.Helpers.UnifiedResponse;
 using Cinema.Core.Interfaces;
 using Cinema.Core.Interfaces.Extra;
 using Cinema.Core.Models;
@@ -40,9 +41,6 @@ public class MovieService : IMovieService
         
         var movieDetailsDto = _mapper.Map<MovieDetailsDto>(movie);
         
-        // movieDetailsDto.Genres = movie.Genres.Select(g => g.Name).ToList();
-        // movieDetailsDto.Starring = movie.Starring.Select(a => $"{a.FirstName} {a.LastName}").ToList();
-        
         return Result.Success(movieDetailsDto);
     }
     
@@ -50,34 +48,29 @@ public class MovieService : IMovieService
     {
         // "current" means movies where rental period is still active
         var movies = _repository.GetAll<Movie>().AsNoTracking();
-        var currentMovies = movies.Where(m => m.RentalPeriodEnd > DateTime.UtcNow);
+        var currentMovies = movies.Where(m => m.RentalPeriodEnd > DateOnly.FromDateTime(DateTime.UtcNow));
         
         var resultList = await currentMovies.ToListAsync();
         var mappedResultList = _mapper.Map<ICollection<MovieMinimalDto>>(resultList);
         return Result.Success(mappedResultList);
     }
 
-    public async Task<Result<Movie>> CreateMovie(CreateMovieDto createMovieDto)
+    public async Task<Result<MovieMinimalDto>> CreateMovie(CreateMovieDto createMovieDto)
     {
-        // Validate DTO
-        var validationResult = ValidateCreateMovieDto(createMovieDto);
-        if (!validationResult.IsSuccess)
-            return Result.Failure<Movie>(validationResult.Error);
-
         // Handle file upload
         var uploadResult = await UploadMovieImage(createMovieDto.Image);
         if (!uploadResult.IsSuccess)
-            return Result.Failure<Movie>(uploadResult.Error);
+            return Result.Failure<MovieMinimalDto>(uploadResult.Error);
 
         // Fetch related genres
         var genresResult = await FetchGenres(createMovieDto.Genres);
         if (!genresResult.IsSuccess)
-            return Result.Failure<Movie>(genresResult.Error);
+            return Result.Failure<MovieMinimalDto>(genresResult.Error);
 
         // Fetch related actors
         var actorsResult = await FetchActors(createMovieDto.Starring);
         if (!actorsResult.IsSuccess)
-            return Result.Failure<Movie>(actorsResult.Error);
+            return Result.Failure<MovieMinimalDto>(actorsResult.Error);
 
         // Create movie entity
         var movie = _mapper.Map<Movie>(createMovieDto);
@@ -94,18 +87,10 @@ public class MovieService : IMovieService
         await _repository.AddAsync(movie);
         await _repository.SaveChangesAsync();
 
-        return Result.Success(movie);
+        return Result.Success(_mapper.Map<MovieMinimalDto>(movie));
     }
 
     #region Helpers
-
-    private Result ValidateCreateMovieDto(CreateMovieDto dto)
-    {
-        var errors = dto.Validate();
-        return errors.Count > 0
-            ? Result.Failure(string.Join(",", errors))
-            : Result.Success();
-    }
     
     private async Task<Result<string>> UploadMovieImage(IFormFile image)
     {

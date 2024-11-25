@@ -1,4 +1,4 @@
-﻿namespace Cinema.Core.Helpers;
+﻿namespace Cinema.Core.Helpers.UnifiedResponse;
 
 public class Result<T> : Result
 {

@@ -1,11 +1,18 @@
+using Cinema_Backend.Filters;
 using Cinema.Core;
+using Cinema.Core.DTOs;
+using Cinema.Core.DTOs.Branch;
 using Cinema.Core.Interfaces;
 using Cinema.Core.Interfaces.Extra;
 using Cinema.Core.Services;
 using Cinema.Core.Services.Extra;
+using Cinema.Core.Validators;
+using Cinema.Core.Validators.Branch;
+using Cinema.Core.Validators.Movie;
 using Cinema.Storage;
 using Cinema.Storage.Contexts;
-using Microsoft.AspNetCore.Authentication;
+using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
@@ -24,10 +31,32 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Local")));
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
-    
+
 builder.Services.AddScoped<IRepository, Repository>();
+
+#region Services
+
 builder.Services.AddScoped<IFileUploadService, FileLocalUploadService>();
 builder.Services.AddScoped<IMovieService, MovieService>();
+builder.Services.AddScoped<IBranchService, BranchService>();
+
+#endregion
+
+#region Validators
+// builder.Services.AddValidatorsFromAssemblyContaining<CreateMovieDtoValidator>();
+
+//Movie
+builder.Services.AddScoped<IValidator<CreateMovieDto>, CreateMovieDtoValidator>();
+
+//Branch
+builder.Services.AddScoped<IValidator<CreateBranchDto>, CreateBranchDtoValidator>();
+builder.Services.AddScoped<IValidator<UpdateBranchDto>, UpdateBranchDtoValidator>();
+
+#endregion
+
+builder.Services.AddScoped<ValidationFilter>();
+//--------------------------------------------------------
+
 // builder.Services.AddScoped<IUserService, UserService>();
 
 // builder.Services.AddAuthentication(options =>
@@ -37,7 +66,17 @@ builder.Services.AddScoped<IMovieService, MovieService>();
 //     })
 //     .AddScheme<AuthenticationSchemeOptions, NoAuthHandler>("NoAuth", options => {});
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+});
+
+// Turns off automatic Validation Check
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
