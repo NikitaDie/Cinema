@@ -80,7 +80,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("name");
             entity.Property(e => e.Address)
                 .IsRequired()
-                .HasMaxLength(255) // Adjust length if needed
+                .HasMaxLength(255)
                 .HasColumnName("address");
             entity.Property(e => e.City)
                 .IsRequired()
@@ -335,7 +335,7 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("seats");
 
-            entity.HasIndex(e => new { e.Row, e.Seat1, e.AuditoriumId }, "unique_row_seat").IsUnique();
+            entity.HasIndex(e => new { e.Row, e.Column, e.AuditoriumId }, "unique_row_column").IsUnique();
 
             entity.HasIndex(e => new { e.XPosition, e.YPosition, e.AuditoriumId }, "unique_x_position_y_position").IsUnique();
 
@@ -344,7 +344,7 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.AuditoriumId).HasColumnName("auditorium_id");
             entity.Property(e => e.Row).HasColumnName("row");
-            entity.Property(e => e.Seat1).HasColumnName("seat");
+            entity.Property(e => e.Column).HasColumnName("column");
             entity.Property(e => e.StatusId).HasColumnName("status_id");
             entity.Property(e => e.XPosition).HasColumnName("x_position");
             entity.Property(e => e.YPosition).HasColumnName("y_position");

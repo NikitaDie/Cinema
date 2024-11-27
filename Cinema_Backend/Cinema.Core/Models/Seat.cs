@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Cinema.Core.Models;
+﻿namespace Cinema.Core.Models;
 
 public partial class Seat
 {
@@ -9,7 +6,7 @@ public partial class Seat
 
     public short Row { get; set; }
 
-    public short Seat1 { get; set; }
+    public short Column { get; set; }
 
     public short XPosition { get; set; }
 

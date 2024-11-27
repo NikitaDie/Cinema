@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Cinema.Core.Models;
+﻿namespace Cinema.Core.Models;
 
 public partial class Status
 {

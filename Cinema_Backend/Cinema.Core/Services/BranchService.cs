@@ -29,7 +29,7 @@ public class BranchService : IBranchService
 
         if (branch == null)
         {
-            return  Result.Failure<GetBranchDto>("Branch not found.");
+            return Result.Failure<GetBranchDto>("Branch not found.");
         }
 
         var branchDto = _mapper.Map<GetBranchDto>(branch);

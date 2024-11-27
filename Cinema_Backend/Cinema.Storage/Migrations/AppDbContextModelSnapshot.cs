@@ -347,13 +347,13 @@ namespace Cinema.Storage.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("auditorium_id");
 
+                    b.Property<short>("Column")
+                        .HasColumnType("smallint")
+                        .HasColumnName("column");
+
                     b.Property<short>("Row")
                         .HasColumnType("smallint")
                         .HasColumnName("row");
-
-                    b.Property<short>("Seat1")
-                        .HasColumnType("smallint")
-                        .HasColumnName("seat");
 
                     b.Property<Guid>("StatusId")
                         .HasColumnType("uuid")
@@ -374,7 +374,7 @@ namespace Cinema.Storage.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.HasIndex(new[] { "Row", "Seat1", "AuditoriumId" }, "unique_row_seat")
+                    b.HasIndex(new[] { "Row", "Column", "AuditoriumId" }, "unique_row_column")
                         .IsUnique();
 
                     b.HasIndex(new[] { "XPosition", "YPosition", "AuditoriumId" }, "unique_x_position_y_position")
