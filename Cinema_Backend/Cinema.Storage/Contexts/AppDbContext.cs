@@ -55,7 +55,11 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(25)
                 .HasColumnName("name");
-
+            entity.Property(e => e.DeletedAt)
+                .HasColumnType("date")
+                .HasColumnName("deleted_at");
+            
+            
             entity.HasOne(d => d.Branch).WithMany(p => p.Auditoriums)
                 .HasForeignKey(d => d.BranchId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -348,6 +352,10 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.StatusId).HasColumnName("status_id");
             entity.Property(e => e.XPosition).HasColumnName("x_position");
             entity.Property(e => e.YPosition).HasColumnName("y_position");
+            entity.Property(e => e.DeletedAt)
+                .HasColumnType("date")
+                .HasColumnName("deleted_at");
+
 
             entity.HasOne(d => d.Auditorium).WithMany(p => p.Seats)
                 .HasForeignKey(d => d.AuditoriumId)
@@ -358,6 +366,8 @@ public partial class AppDbContext : DbContext
                 .HasForeignKey(d => d.StatusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_status");
+            
+            
         });
 
         modelBuilder.Entity<Session>(entity =>
@@ -403,6 +413,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(25)
                 .HasColumnName("name");
+            entity.Property(e => e.DeletedAt)
+                .HasColumnType("date")
+                .HasColumnName("deleted_at");
         });
 
         modelBuilder.Entity<Ticket>(entity =>

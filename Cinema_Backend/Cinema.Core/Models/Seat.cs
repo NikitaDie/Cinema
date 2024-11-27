@@ -15,6 +15,8 @@ public partial class Seat
     public Guid AuditoriumId { get; set; }
 
     public Guid StatusId { get; set; }
+    
+    public DateOnly? DeletedAt { get; set; }
 
     public virtual Auditorium Auditorium { get; set; } = null!;
 

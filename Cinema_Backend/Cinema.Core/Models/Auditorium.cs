@@ -9,6 +9,8 @@ public partial class Auditorium
     public Guid BranchId { get; set; }
 
     public virtual Branch Branch { get; set; } = null!;
+    
+    public DateOnly? DeletedAt { get; set; }
 
     public virtual ICollection<Seat> Seats { get; set; } = new List<Seat>();
 

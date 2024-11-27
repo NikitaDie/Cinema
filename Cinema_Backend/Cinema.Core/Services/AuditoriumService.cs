@@ -21,9 +21,10 @@ public class AuditoriumService : IAuditoriumService
     public async Task<Result<AuditoriumDetailsDto>> GetAuditorium(Guid id)
     {
         var auditorium = await _repository.GetAll<Auditorium>()
-            // .Where(a => !a.IsDeleted)
+            .Where(a => a.DeletedAt == null)
             .Include(a => a.Seats)
                 .ThenInclude(seat => seat.Status)
+            .AsNoTracking()
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (auditorium == null)
