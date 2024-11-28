@@ -2,5 +2,5 @@
 
 public class SessionController
 {
-    
+    //create here pricelist too.
 }

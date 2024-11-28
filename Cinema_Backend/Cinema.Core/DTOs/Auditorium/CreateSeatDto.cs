@@ -10,7 +10,7 @@ public class CreateSeatDto
 
     public short YPosition { get; set; }
 
-    public Guid AuditoriumId { get; set; }
+    // public Guid AuditoriumId { get; set; }
 
     public Guid StatusId { get; set; }
 }

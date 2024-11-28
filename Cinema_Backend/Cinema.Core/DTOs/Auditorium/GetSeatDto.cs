@@ -12,5 +12,5 @@ public class GetSeatDto
 
     public short YPosition { get; set; }
 
-    public GetStatusDto Stasus { get; set; } = null!;
+    public string Stasus { get; set; } = null!;
 }
