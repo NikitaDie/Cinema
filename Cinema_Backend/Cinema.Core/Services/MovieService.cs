@@ -37,6 +37,8 @@ public class MovieService : IMovieService
         
         var movieDetailsDto = _mapper.Map<MovieDetailsDto>(movie);
         
+        movieDetailsDto.ImageUri = _fileUploadService.GetFileUrl(movie.ImagePath); 
+        
         return Result.Success(movieDetailsDto);
     }
     
@@ -48,6 +50,12 @@ public class MovieService : IMovieService
         
         var resultList = await currentMovies.ToListAsync();
         var mappedResultList = _mapper.Map<ICollection<MovieMinimalDto>>(resultList);
+        
+        foreach (var movie in mappedResultList) // Map image URI
+        {
+            movie.ImageUri = _fileUploadService.GetFileUrl(movie.ImageUri); 
+        }
+        
         return Result.Success(mappedResultList);
     }
 

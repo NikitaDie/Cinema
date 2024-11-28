@@ -15,10 +15,7 @@ public class FileLocalUploadService : IFileUploadService
     public FileLocalUploadService(IConfiguration configuration)
     {
         _uploadsDirectory = Path.Combine(Directory.GetCurrentDirectory(), configuration["UploadsDirectory"] ?? "public");
-        _moviesUploadsDirectoryExtension = Path.Combine(
-            Directory.GetCurrentDirectory(), 
-            configuration["MoviesUploadsDirectoryExtension"] ?? "movies"
-            );
+        _moviesUploadsDirectoryExtension = configuration["MoviesUploadsDirectoryExtension"] ?? "movies";
     }
     
     private static string GenerateUniqueFileName(IFormFile file)
@@ -47,10 +44,11 @@ public class FileLocalUploadService : IFileUploadService
 
         await using var stream = new FileStream(filePath, FileMode.Create);
         await file.CopyToAsync(stream);
+        //return actual file name
     }
     
     public string GetFileUrl(string fileName)
-        => Path.Combine(_uploadsDirectory, _moviesUploadsDirectoryExtension, fileName);
+        => $"http://localhost:5054/uploads/{_moviesUploadsDirectoryExtension}/{fileName}";
     
     private static void ValidateFile(IFormFile file)
     {

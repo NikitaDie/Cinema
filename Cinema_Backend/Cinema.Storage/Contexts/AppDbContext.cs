@@ -161,8 +161,6 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("movies");
 
-            entity.HasIndex(e => e.ImagePath, "movies_image_path_key").IsUnique();
-
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
@@ -390,11 +388,11 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.AuditoriumId).HasColumnName("auditorium_id");
             entity.Property(e => e.EndTime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("end_time");
             entity.Property(e => e.MovieId).HasColumnName("movie_id");
             entity.Property(e => e.StartTime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("start_time");
 
             entity.HasOne(d => d.Auditorium).WithMany(p => p.Sessions)
@@ -436,13 +434,13 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.ClientId).HasColumnName("client_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.SeatId).HasColumnName("seat_id");
             entity.Property(e => e.SessionId).HasColumnName("session_id");
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Client).WithMany(p => p.Tickets)

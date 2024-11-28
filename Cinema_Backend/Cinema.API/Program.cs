@@ -1,3 +1,4 @@
+using AutoMapper;
 using Cinema_Backend.Filters;
 using Cinema.Core;
 using Cinema.Core.DTOs;
@@ -33,11 +34,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-builder.Services.AddScoped<IRepository, Repository>();
-
 #region Services
-
+builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IFileUploadService, FileLocalUploadService>();
+
 builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<IBranchService, BranchService>();
 builder.Services.AddScoped<IStatusService, StatusService>();
