@@ -11,6 +11,7 @@ using Cinema.Core.Validators.Branch;
 using Cinema.Core.Validators.Movie;
 using Cinema.Storage;
 using Cinema.Storage.Contexts;
+using Cinema.Storage.Utils;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -39,6 +40,10 @@ builder.Services.AddScoped<IRepository, Repository>();
 builder.Services.AddScoped<IFileUploadService, FileLocalUploadService>();
 builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<IBranchService, BranchService>();
+builder.Services.AddScoped<IStatusService, StatusService>();
+builder.Services.AddScoped<IAuditoriumService, AuditoriumService>();
+
+builder.Services.AddScoped<DataSeeder>();
 
 #endregion
 
@@ -88,6 +93,7 @@ app.UseCors("AllowFrontend");
 
 // Configure Static File Middleware
 var uploadsDirectory = Path.Combine(Directory.GetCurrentDirectory(), builder.Configuration["UploadsDirectory"] ?? "public");
+var staticFilesRequestPath = Path.Combine(Directory.GetCurrentDirectory(), builder.Configuration["StaticFilesRequestPath"] ?? "/uploads");
 
 if (!Directory.Exists(uploadsDirectory))
 {
@@ -98,7 +104,7 @@ if (!Directory.Exists(uploadsDirectory))
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(uploadsDirectory),
-    RequestPath = "/uploads" // The URL route to access the files
+    RequestPath = staticFilesRequestPath // The URL route to access the files
 });
 
 app.UseStaticFiles();  // Enables serving static files from wwwroot by default
@@ -108,6 +114,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    
+    //Seed the database
+    using var scope = app.Services.CreateScope();
+    var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+    await seeder.SeedAsync();
 }
 
 app.UseHttpsRedirection();

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cinema.Core.Models.Helpers;
 
 namespace Cinema.Core.Models;
 
-public partial class Branch
+public partial class Branch : SoftDelete
 {
     public Guid Id { get; set; }
 
@@ -18,8 +19,6 @@ public partial class Branch
     public string ZipCode { get; set; } = null!;
     
     public string PhoneNumber { get; set; } = null!;
-    
-    public bool IsDeleted { get; set; }
 
     public virtual ICollection<Auditorium> Auditoriums { get; set; } = new List<Auditorium>();
 }

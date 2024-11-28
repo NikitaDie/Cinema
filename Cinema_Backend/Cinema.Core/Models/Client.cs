@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cinema.Core.Models.Helpers;
 
 namespace Cinema.Core.Models;
 
-public partial class Client
+public partial class Client : SoftDelete
 {
     public Guid Id { get; set; }
 
@@ -12,12 +13,6 @@ public partial class Client
     public string LastName { get; set; } = null!;
 
     public string? Email { get; set; }
-
-    public string? PhoneNumber { get; set; }
-
-    public string? Address { get; set; }
-
-    public DateOnly? DateOfBirth { get; set; }
 
     public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 }

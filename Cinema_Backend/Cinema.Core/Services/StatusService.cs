@@ -77,7 +77,7 @@ public class StatusService : IStatusService
         if (status == null)
             return Result.Failure("Status not found.");
 
-        status.DeletedAt = DateOnly.FromDateTime(DateTime.Today);
+        _repository.Delete(status);
         await _repository.SaveChangesAsync();
         
         return Result.Success();

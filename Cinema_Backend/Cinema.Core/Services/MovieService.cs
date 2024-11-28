@@ -1,29 +1,25 @@
 ﻿using AutoMapper;
 using Cinema.Core.DTOs;
-using Cinema.Core.Helpers;
 using Cinema.Core.Helpers.UnifiedResponse;
 using Cinema.Core.Interfaces;
 using Cinema.Core.Interfaces.Extra;
 using Cinema.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace Cinema.Core.Services;
 
 public class MovieService : IMovieService
 {
-    private readonly string _uploadsDirectory;
     private readonly IMapper _mapper;
     private readonly IRepository _repository;
     private readonly IFileUploadService _fileUploadService;
 
-    public MovieService(IRepository repository, IConfiguration configuration, IMapper mapper, IFileUploadService fileUploadService)
+    public MovieService(IRepository repository, IMapper mapper, IFileUploadService fileUploadService)
     {
         _mapper = mapper;
         _repository = repository;
         _fileUploadService = fileUploadService;
-        _uploadsDirectory = Path.Combine(Directory.GetCurrentDirectory(), configuration["UploadsDirectory"] ?? "public");
     }
     
     public async Task<Result<MovieDetailsDto>> GetMovieDetails(Guid id)
@@ -76,12 +72,6 @@ public class MovieService : IMovieService
         var movie = _mapper.Map<Movie>(createMovieDto);
         movie.Genres = genresResult.Data ?? new List<Genre>();     // Assign retrieved genres
         movie.Starring = actorsResult.Data ?? new List<Actor>();   // Assign retrieved actors
-        
-        try {
-            movie.ImagePath = uploadResult.Data ?? throw new InvalidOperationException();   // Set uploaded file path
-        } catch (Exception e) {
-            Result.Failure<Movie>("Image upload failed");
-        }
 
         // Save to repository
         await _repository.AddAsync(movie);
@@ -92,17 +82,16 @@ public class MovieService : IMovieService
 
     #region Helpers
     
-    private async Task<Result<string>> UploadMovieImage(IFormFile image)
+    private async Task<Result> UploadMovieImage(IFormFile image)
     {
         try
         {
-            var uploadDirectory = Path.Combine(_uploadsDirectory, "movies");
-            var filePath = await _fileUploadService.UploadFile(image, uploadDirectory);
-            return Result.Success(filePath);
+            await _fileUploadService.UploadFile(image);
+            return Result.Success();
         }
         catch (Exception e)
         {
-            return Result.Failure<string>($"Image upload failed: {e.Message}");
+            return Result.Failure($"Image upload failed: {e.Message}");
         }
     }
     

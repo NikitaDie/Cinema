@@ -1,6 +1,8 @@
-﻿namespace Cinema.Core.Models;
+﻿using Cinema.Core.Models.Helpers;
 
-public class Genre
+namespace Cinema.Core.Models;
+
+public class Genre : SoftDelete
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;

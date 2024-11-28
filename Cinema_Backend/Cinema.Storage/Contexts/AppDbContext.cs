@@ -1,4 +1,6 @@
 ﻿using Cinema.Core.Models;
+using Cinema.Core.Models.Helpers;
+using Cinema.Storage.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cinema.Storage.Contexts;
@@ -14,30 +16,61 @@ public partial class AppDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Auditorium> Auditoriums { get; set; }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        => optionsBuilder
+            .AddInterceptors(new SoftDeleteInterceptor());
 
-    public virtual DbSet<Branch> Branches { get; set; }
+    public virtual DbSet<Auditorium> Auditoriums { get; set; } = null!;
 
-    public virtual DbSet<Client> Clients { get; set; }
+    public virtual DbSet<Branch> Branches { get; set; } = null!;
 
-    public virtual DbSet<Movie> Movies { get; set; }
+    public virtual DbSet<Client> Clients { get; set; } = null!;
 
-    public virtual DbSet<Genre> Genres { get; set; }
+    public virtual DbSet<Movie> Movies { get; set; } = null!;
+
+    public virtual DbSet<Genre> Genres { get; set; } = null!;
     
-    public virtual DbSet<Actor> Actors { get; set; }
+    public virtual DbSet<Actor> Actors { get; set; } = null!;
 
-    public virtual DbSet<Pricelist> Pricelists { get; set; }
+    public virtual DbSet<Pricelist> Pricelists { get; set; } = null!;
 
-    public virtual DbSet<Seat> Seats { get; set; }
+    public virtual DbSet<Seat> Seats { get; set; } = null!;
 
-    public virtual DbSet<Session> Sessions { get; set; }
+    public virtual DbSet<Session> Sessions { get; set; } = null!;
 
-    public virtual DbSet<Status> Statuses { get; set; }
+    public virtual DbSet<Status> Statuses { get; set; } = null!;
 
-    public virtual DbSet<Ticket> Tickets { get; set; }
+    public virtual DbSet<Ticket> Tickets { get; set; } = null!;
 
+    private static void ConfigureSoftDelete(ModelBuilder modelBuilder)
+    {
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            // Check if the entity inherits from SoftDelete
+            if (typeof(SoftDelete).IsAssignableFrom(entityType.ClrType))
+            {
+                modelBuilder.Entity(entityType.ClrType).Property(nameof(SoftDelete.IsDeleted)).HasDefaultValue(false);
+                modelBuilder.Entity(entityType.ClrType).Property(nameof(SoftDelete.DeletedAt)).IsRequired(false);
+            }
+        }
+    }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        ConfigureSoftDelete(modelBuilder);
+        
+        modelBuilder.Entity<Auditorium>().HasQueryFilter(e => e.IsDeleted == false);
+        modelBuilder.Entity<Branch>().HasQueryFilter(e => e.IsDeleted == false);
+        modelBuilder.Entity<Client>().HasQueryFilter(e => e.IsDeleted == false);
+        modelBuilder.Entity<Movie>().HasQueryFilter(e => e.IsDeleted == false);
+        modelBuilder.Entity<Genre>().HasQueryFilter(e => e.IsDeleted == false);
+        modelBuilder.Entity<Actor>().HasQueryFilter(e => e.IsDeleted == false);
+        modelBuilder.Entity<Pricelist>().HasQueryFilter(e => e.IsDeleted == false);
+        modelBuilder.Entity<Seat>().HasQueryFilter(e => e.IsDeleted == false);
+        modelBuilder.Entity<Session>().HasQueryFilter(e => e.IsDeleted == false);
+        modelBuilder.Entity<Status>().HasQueryFilter(e => e.IsDeleted == false);
+        modelBuilder.Entity<Ticket>().HasQueryFilter(e => e.IsDeleted == false);
+        
         modelBuilder.Entity<Auditorium>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("auditoriums_pkey");
@@ -55,14 +88,10 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(25)
                 .HasColumnName("name");
-            entity.Property(e => e.DeletedAt)
-                .HasColumnType("date")
-                .HasColumnName("deleted_at");
             
             
             entity.HasOne(d => d.Branch).WithMany(p => p.Auditoriums)
                 .HasForeignKey(d => d.BranchId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_branch");
         });
 
@@ -102,10 +131,6 @@ public partial class AppDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .HasColumnName("phone_number");
-            entity.Property(e => e.IsDeleted)
-                .IsRequired()
-                .HasDefaultValue(false)
-                .HasColumnName("is_deleted");
         });
 
         modelBuilder.Entity<Client>(entity =>
@@ -119,10 +144,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
-            entity.Property(e => e.Address)
-                .HasMaxLength(255)
-                .HasColumnName("address");
-            entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .HasColumnName("email");
@@ -132,9 +153,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.LastName)
                 .HasMaxLength(50)
                 .HasColumnName("last_name");
-            entity.Property(e => e.PhoneNumber)
-                .HasMaxLength(20)
-                .HasColumnName("phone_number");
         });
 
         modelBuilder.Entity<Movie>(entity =>
@@ -324,12 +342,10 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Session).WithMany(p => p.Pricelists)
                 .HasForeignKey(d => d.SessionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_session");
 
             entity.HasOne(d => d.Status).WithMany(p => p.Pricelists)
                 .HasForeignKey(d => d.StatusId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_status");
         });
 
@@ -352,22 +368,15 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.StatusId).HasColumnName("status_id");
             entity.Property(e => e.XPosition).HasColumnName("x_position");
             entity.Property(e => e.YPosition).HasColumnName("y_position");
-            entity.Property(e => e.DeletedAt)
-                .HasColumnType("date")
-                .HasColumnName("deleted_at");
 
 
             entity.HasOne(d => d.Auditorium).WithMany(p => p.Seats)
                 .HasForeignKey(d => d.AuditoriumId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_auditorium");
 
             entity.HasOne(d => d.Status).WithMany(p => p.Seats)
                 .HasForeignKey(d => d.StatusId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_status");
-            
-            
         });
 
         modelBuilder.Entity<Session>(entity =>
@@ -390,12 +399,10 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Auditorium).WithMany(p => p.Sessions)
                 .HasForeignKey(d => d.AuditoriumId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_auditorium");
 
             entity.HasOne(d => d.Movie).WithMany(p => p.Sessions)
                 .HasForeignKey(d => d.MovieId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_movie");
         });
 
@@ -413,9 +420,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(25)
                 .HasColumnName("name");
-            entity.Property(e => e.DeletedAt)
-                .HasColumnType("date")
-                .HasColumnName("deleted_at");
         });
 
         modelBuilder.Entity<Ticket>(entity =>
@@ -443,22 +447,19 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Client).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.ClientId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_client");
 
             entity.HasOne(d => d.Seat).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.SeatId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_seat");
 
             entity.HasOne(d => d.Session).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.SessionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_session");
         });
 
         OnModelCreatingPartial(modelBuilder);
     }
-
+    
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

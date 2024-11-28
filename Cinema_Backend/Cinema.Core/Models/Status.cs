@@ -1,12 +1,12 @@
-﻿namespace Cinema.Core.Models;
+﻿using Cinema.Core.Models.Helpers;
 
-public partial class Status
+namespace Cinema.Core.Models;
+
+public partial class Status : SoftDelete
 {
     public Guid Id { get; set; }
 
     public string Name { get; set; } = null!;
-    
-    public DateOnly? DeletedAt { get; set; }
     
     public virtual ICollection<Pricelist> Pricelists { get; set; } = new List<Pricelist>();
 

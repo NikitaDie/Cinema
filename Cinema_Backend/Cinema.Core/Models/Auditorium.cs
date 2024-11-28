@@ -1,6 +1,8 @@
-﻿namespace Cinema.Core.Models;
+﻿using Cinema.Core.Models.Helpers;
 
-public partial class Auditorium
+namespace Cinema.Core.Models;
+
+public partial class Auditorium : SoftDelete
 {
     public Guid Id { get; set; }
 
@@ -9,8 +11,6 @@ public partial class Auditorium
     public Guid BranchId { get; set; }
 
     public virtual Branch Branch { get; set; } = null!;
-    
-    public DateOnly? DeletedAt { get; set; }
 
     public virtual ICollection<Seat> Seats { get; set; } = new List<Seat>();
 

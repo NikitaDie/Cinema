@@ -1,14 +1,26 @@
 ﻿using Cinema.Core.Interfaces.Extra;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace Cinema.Core.Services.Extra;
 
 public class FileLocalUploadService : IFileUploadService
 {
-    private static readonly int _maxFileSizeMB = 25;
-    private static readonly string[] _allowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp"];
-    private static readonly long _maxFileSize = _maxFileSizeMB * 1024 * 1024; // 5 MB
+    private readonly string _uploadsDirectory;
+    private readonly string _moviesUploadsDirectoryExtension;
+    private const int MaxFileSizeMb = 25;
+    private static readonly string[] AllowedExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp"];
+    private const long MaxFileSize = MaxFileSizeMb * 1024 * 1024; // 5 MB
 
+    public FileLocalUploadService(IConfiguration configuration)
+    {
+        _uploadsDirectory = Path.Combine(Directory.GetCurrentDirectory(), configuration["UploadsDirectory"] ?? "public");
+        _moviesUploadsDirectoryExtension = Path.Combine(
+            Directory.GetCurrentDirectory(), 
+            configuration["MoviesUploadsDirectoryExtension"] ?? "movies"
+            );
+    }
+    
     private static string GenerateUniqueFileName(IFormFile file)
     {
         var fileName = Path.GetFileNameWithoutExtension(file.FileName);
@@ -18,24 +30,27 @@ public class FileLocalUploadService : IFileUploadService
         return uniqueFileName;
     }
     
-    public async Task<string> UploadFile(IFormFile file, string uploadDirectory)
+    public async Task UploadFile(IFormFile file)
     {
         ValidateFile(file);
+
+        var fileDirectory = Path.Combine(_uploadsDirectory, _moviesUploadsDirectoryExtension);
         
         // Ensure the directory exists
-        if (!Directory.Exists(uploadDirectory))
+        if (!Directory.Exists(fileDirectory))
         {
-            Directory.CreateDirectory(uploadDirectory);
+            Directory.CreateDirectory(fileDirectory);
         }
 
         var uniqueFileName = GenerateUniqueFileName(file);
-        var filePath = Path.Combine(uploadDirectory, uniqueFileName);
+        var filePath = Path.Combine(fileDirectory, uniqueFileName);
 
         await using var stream = new FileStream(filePath, FileMode.Create);
         await file.CopyToAsync(stream);
-
-        return filePath;
     }
+    
+    public string GetFileUrl(string fileName)
+        => Path.Combine(_uploadsDirectory, _moviesUploadsDirectoryExtension, fileName);
     
     private static void ValidateFile(IFormFile file)
     {
@@ -44,13 +59,13 @@ public class FileLocalUploadService : IFileUploadService
             throw new ArgumentException("No file uploaded.");
         }
         
-        if (file.Length > _maxFileSize)
+        if (file.Length > MaxFileSize)
         {
-            throw new ArgumentException($"File size exceeds the {_maxFileSizeMB} MB limit.");
+            throw new ArgumentException($"File size exceeds the {MaxFileSizeMb} MB limit.");
         }
         
         var fileExtension = Path.GetExtension(file.FileName).ToLower();
-        if (!_allowedExtensions.Contains(fileExtension))
+        if (!AllowedExtensions.Contains(fileExtension))
         {
             throw new ArgumentException("Invalid file type. Only image files are allowed.");
         }

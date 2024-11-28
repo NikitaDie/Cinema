@@ -1,6 +1,8 @@
-﻿namespace Cinema.Core.Models;
+﻿using Cinema.Core.Models.Helpers;
 
-public partial class Seat
+namespace Cinema.Core.Models;
+
+public partial class Seat : SoftDelete
 {
     public Guid Id { get; set; }
 
@@ -15,8 +17,6 @@ public partial class Seat
     public Guid AuditoriumId { get; set; }
 
     public Guid StatusId { get; set; }
-    
-    public DateOnly? DeletedAt { get; set; }
 
     public virtual Auditorium Auditorium { get; set; } = null!;
 

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cinema.Core.Models.Helpers;
 
 namespace Cinema.Core.Models;
 
-public partial class Pricelist
+public partial class Pricelist : SoftDelete
 {
     public Guid Id { get; set; }
 

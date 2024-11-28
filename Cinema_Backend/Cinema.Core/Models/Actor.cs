@@ -1,6 +1,8 @@
-﻿namespace Cinema.Core.Models;
+﻿using Cinema.Core.Models.Helpers;
 
-public class Actor
+namespace Cinema.Core.Models;
+
+public class Actor : SoftDelete
 {
     public Guid Id { get; set; }
     
