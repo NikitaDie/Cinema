@@ -42,21 +42,21 @@ public class SessionService : ISessionService
 
     public async Task<Result<ICollection<SessionMinimalDto>>> GetAllSessions(SessionFilter filter, int skip, int take)
     {
-        var sessiones = _repository.GetAll<Session>().AsNoTracking();
+        var sessions = _repository.GetAll<Session>().AsNoTracking();
         
         if (filter.After is not null)
-            sessiones = sessiones.Where(s => s.StartTime >= filter.After);
+            sessions = sessions.Where(s => s.StartTime >= filter.After);
         
         if (filter.Until is not null)
-            sessiones = sessiones.Where(s => s.EndTime <= filter.Until);
+            sessions = sessions.Where(s => s.EndTime <= filter.Until);
         
         if (filter.AuditoriumId is not null)
-            sessiones = sessiones.Where(s => s.AuditoriumId == filter.AuditoriumId);
+            sessions = sessions.Where(s => s.AuditoriumId == filter.AuditoriumId);
         
         if (filter.MovieId is not null)
-            sessiones = sessiones.Where(s => s.MovieId == filter.MovieId);
+            sessions = sessions.Where(s => s.MovieId == filter.MovieId);
         
-        var resultList = await sessiones.Skip(skip).Take(take).ToListAsync();
+        var resultList = await sessions.Skip(skip).Take(take).ToListAsync();
         var mappedResultList = _mapper.Map<ICollection<SessionMinimalDto>>(resultList);
         return Result.Success(mappedResultList);
     }
@@ -74,10 +74,13 @@ public class SessionService : ISessionService
     public async Task<Result> DeleteSession(Guid id)
     {
         var session = await _repository.GetAll<Session>()
+            .Include(s => s.Pricelists)
             .FirstOrDefaultAsync(b => b.Id == id);
         
         if (session == null)
             return Result.Failure<SessionDetailedDto>("Session not found.");
+        
+        session.Pricelists.ToList().ForEach(pl => _repository.Delete(pl));
         
         _repository.Delete(session);
         await _repository.SaveChangesAsync();
