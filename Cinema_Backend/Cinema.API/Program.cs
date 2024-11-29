@@ -3,6 +3,7 @@ using Cinema_Backend.Filters;
 using Cinema.Core;
 using Cinema.Core.DTOs;
 using Cinema.Core.DTOs.Branch;
+using Cinema.Core.DTOs.Session;
 using Cinema.Core.Interfaces;
 using Cinema.Core.Interfaces.Extra;
 using Cinema.Core.Services;
@@ -10,6 +11,7 @@ using Cinema.Core.Services.Extra;
 using Cinema.Core.Validators;
 using Cinema.Core.Validators.Branch;
 using Cinema.Core.Validators.Movie;
+using Cinema.Core.Validators.Pricelist;
 using Cinema.Storage;
 using Cinema.Storage.Contexts;
 using Cinema.Storage.Utils;
@@ -42,6 +44,7 @@ builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<IBranchService, BranchService>();
 builder.Services.AddScoped<IStatusService, StatusService>();
 builder.Services.AddScoped<IAuditoriumService, AuditoriumService>();
+builder.Services.AddScoped<ISessionService, SessionService>();
 
 builder.Services.AddScoped<DataSeeder>();
 
@@ -56,6 +59,9 @@ builder.Services.AddScoped<IValidator<CreateMovieDto>, CreateMovieDtoValidator>(
 //Branch
 builder.Services.AddScoped<IValidator<CreateBranchDto>, CreateBranchDtoValidator>();
 builder.Services.AddScoped<IValidator<UpdateBranchDto>, UpdateBranchDtoValidator>();
+
+//Pricelist
+builder.Services.AddScoped<IValidator<CreatePricelistDto>, CreatePricelistDtoValidator>();
 
 #endregion
 

@@ -6,5 +6,5 @@ namespace Cinema.Core.Interfaces;
 public interface IAuditoriumService
 {
     Task<Result<AuditoriumMinimalDto>> CreateAuditorium(CreateAuditoriumDto newAuditorium);
-    Task<Result<AuditoriumDetailsDto>> GetAuditorium(Guid id);
+    Task<Result<AuditoriumDetailedDto>> GetAuditorium(Guid id);
 }

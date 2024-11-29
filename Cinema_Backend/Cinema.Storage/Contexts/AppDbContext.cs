@@ -89,10 +89,10 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(25)
                 .HasColumnName("name");
             
-            
             entity.HasOne(d => d.Branch).WithMany(p => p.Auditoriums)
                 .HasForeignKey(d => d.BranchId)
-                .HasConstraintName("fk_branch");
+                .HasConstraintName("fk_branch")
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Branch>(entity =>
@@ -286,7 +286,8 @@ public partial class AppDbContext : DbContext
 
             entity.HasMany(e => e.Sessions)
                 .WithOne(e => e.Movie)
-                .HasForeignKey(e => e.MovieId);
+                .HasForeignKey(e => e.MovieId)
+                .OnDelete(DeleteBehavior.Cascade);;
         });
 
         modelBuilder.Entity<Genre>(entity =>
@@ -340,11 +341,13 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Session).WithMany(p => p.Pricelists)
                 .HasForeignKey(d => d.SessionId)
-                .HasConstraintName("fk_session");
+                .HasConstraintName("fk_session")
+                .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(d => d.Status).WithMany(p => p.Pricelists)
                 .HasForeignKey(d => d.StatusId)
-                .HasConstraintName("fk_status");
+                .HasConstraintName("fk_status")
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Seat>(entity =>
@@ -370,11 +373,13 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Auditorium).WithMany(p => p.Seats)
                 .HasForeignKey(d => d.AuditoriumId)
-                .HasConstraintName("fk_auditorium");
+                .HasConstraintName("fk_auditorium")
+                .OnDelete(DeleteBehavior.Cascade);;
 
             entity.HasOne(d => d.Status).WithMany(p => p.Seats)
                 .HasForeignKey(d => d.StatusId)
-                .HasConstraintName("fk_status");
+                .HasConstraintName("fk_status")
+                .OnDelete(DeleteBehavior.Cascade);;
         });
 
         modelBuilder.Entity<Session>(entity =>
@@ -397,11 +402,13 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Auditorium).WithMany(p => p.Sessions)
                 .HasForeignKey(d => d.AuditoriumId)
-                .HasConstraintName("fk_auditorium");
+                .HasConstraintName("fk_auditorium")
+                .OnDelete(DeleteBehavior.Cascade);;
 
             entity.HasOne(d => d.Movie).WithMany(p => p.Sessions)
                 .HasForeignKey(d => d.MovieId)
-                .HasConstraintName("fk_movie");
+                .HasConstraintName("fk_movie")
+                .OnDelete(DeleteBehavior.Cascade);;
         });
 
         modelBuilder.Entity<Status>(entity =>
@@ -445,15 +452,18 @@ public partial class AppDbContext : DbContext
 
             entity.HasOne(d => d.Client).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("fk_client");
+                .HasConstraintName("fk_client")
+                .OnDelete(DeleteBehavior.Cascade);;
 
             entity.HasOne(d => d.Seat).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.SeatId)
-                .HasConstraintName("fk_seat");
+                .HasConstraintName("fk_seat")
+                .OnDelete(DeleteBehavior.Cascade);;
 
             entity.HasOne(d => d.Session).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.SessionId)
-                .HasConstraintName("fk_session");
+                .HasConstraintName("fk_session")
+                .OnDelete(DeleteBehavior.Cascade);;
         });
 
         OnModelCreatingPartial(modelBuilder);

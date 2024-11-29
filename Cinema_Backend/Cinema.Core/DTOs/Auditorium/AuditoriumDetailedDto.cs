@@ -1,6 +1,6 @@
 ﻿namespace Cinema.Core.DTOs.Auditorium;
 
-public class AuditoriumDetailsDto
+public class AuditoriumDetailedDto
 {
     public Guid Id { get; set; }
 

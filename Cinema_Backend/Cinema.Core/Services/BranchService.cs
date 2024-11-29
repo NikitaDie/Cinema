@@ -22,15 +22,12 @@ public class BranchService : IBranchService
     public async Task<Result<GetBranchDto>> GetBranch(Guid id)
     {
         var branch = await _repository.GetAll<Branch>()
-            .Where(b => !b.IsDeleted)
             .Include(b => b.Auditoriums)
             .AsNoTracking()
             .FirstOrDefaultAsync(b => b.Id == id);
 
         if (branch == null)
-        {
             return Result.Failure<GetBranchDto>("Branch not found.");
-        }
 
         var branchDto = _mapper.Map<GetBranchDto>(branch);
 
@@ -39,7 +36,7 @@ public class BranchService : IBranchService
 
     public async Task<Result<ICollection<GetBranchDto>>> GetAllBranches(BranchFilter filter, int skip, int take)
     {
-        var branches  = _repository.GetAll<Branch>().Where(b => !b.IsDeleted).AsNoTracking();
+        var branches  = _repository.GetAll<Branch>().AsNoTracking();
 
         if (filter.Address is not null)
             branches = branches.Where(b => b.Address.ToLower() == filter.Address.ToLower());
@@ -76,7 +73,6 @@ public class BranchService : IBranchService
     public async Task<Result<GetBranchDto>> UpdateBranch(Guid id, UpdateBranchDto branchToUpdate)
     {
         var branch = await _repository.GetAll<Branch>()
-            .Where(b => !b.IsDeleted)
             .FirstOrDefaultAsync(b => b.Id == id);
 
         if (branch == null)
@@ -91,13 +87,12 @@ public class BranchService : IBranchService
     public async Task<Result> DeleteBranch(Guid id)
     {
         var branch = await _repository.GetAll<Branch>()
-            .Where(b => !b.IsDeleted)
             .FirstOrDefaultAsync(b => b.Id == id);
         
         if (branch == null)
             return Result.Failure("Branch not found.");
 
-        branch.IsDeleted = true;
+        _repository.Delete(branch);
         await _repository.SaveChangesAsync();
         
         return Result.Success();

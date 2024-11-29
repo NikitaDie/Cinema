@@ -18,7 +18,7 @@ public class AuditoriumService : IAuditoriumService
         _repository = repository;
     }
 
-    public async Task<Result<AuditoriumDetailsDto>> GetAuditorium(Guid id)
+    public async Task<Result<AuditoriumDetailedDto>> GetAuditorium(Guid id)
     {
         var auditorium = await _repository.GetAll<Auditorium>()
             .Where(a => a.DeletedAt == null)
@@ -29,10 +29,10 @@ public class AuditoriumService : IAuditoriumService
 
         if (auditorium == null)
         {
-            return Result.Failure<AuditoriumDetailsDto>("Auditorium not found");
+            return Result.Failure<AuditoriumDetailedDto>("Auditorium not found");
         }
 
-        var auditoriumDto = _mapper.Map<AuditoriumDetailsDto>(auditorium);
+        var auditoriumDto = _mapper.Map<AuditoriumDetailedDto>(auditorium);
 
         return Result.Success(auditoriumDto);
     }
