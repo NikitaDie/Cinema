@@ -71,12 +71,21 @@ public class StatusService : IStatusService
     public async Task<Result> DeleteStatus(Guid id)
     {
         var status = await _repository.GetAll<Status>()
-            .Where(s => s.DeletedAt == null)
+            .Include(s => s.Pricelists)
+            .Include(s => s.Seats)
+                .ThenInclude(seat => seat.Tickets)
             .FirstOrDefaultAsync(s => s.Id == id);
         
         if (status == null)
             return Result.Failure("Status not found.");
 
+        status.Pricelists.ToList().ForEach(pl => _repository.Delete(pl));
+        status.Seats.ToList().ForEach(seat =>
+        {
+            seat.Tickets.ToList().ForEach(ticket => _repository.Delete(ticket));
+            _repository.Delete(seat);
+        });
+        
         _repository.Delete(status);
         await _repository.SaveChangesAsync();
         

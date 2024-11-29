@@ -41,7 +41,24 @@ public class MovieService : IMovieService
         
         return Result.Success(movieDetailsDto);
     }
-    
+
+    public async Task<Result> DeleteMovie(Guid id)
+    {
+        var movie = _repository.GetAll<Movie>()
+            .Include(m => m.Sessions)
+            .FirstOrDefault(m => m.Id == id);
+        
+        if (movie == null)
+            return Result.Failure("Movie not found.");
+        
+        movie.Sessions.ToList().ForEach(pl => _repository.Delete(pl));
+        
+        _repository.Delete(movie);
+        await _repository.SaveChangesAsync();
+        
+        return Result.Success();
+    }
+
     public async Task<Result<ICollection<MovieMinimalDto>>> GetAllCurrentMovies()
     {
         // "current" means movies where rental period is still active

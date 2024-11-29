@@ -16,7 +16,7 @@ public class SessionController : ControllerBase
         _sessionService = sessionService;
     }
     
-    //Get api/branches/{id}
+    //Get api/sessions/{id}
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetBranch([FromRoute] Guid id)
     {
@@ -26,7 +26,7 @@ public class SessionController : ControllerBase
             : NotFound(result.Error);
     }
     
-    // GET: api/branches
+    // GET: api/sessions
     [HttpGet]
     public async Task<IActionResult> GetAllBranches(
         [FromQuery] DateTime? after,
@@ -49,7 +49,7 @@ public class SessionController : ControllerBase
             : NotFound(result.Error);
     }
     
-    // POST: api/branches/{id}
+    // POST: api/sessions/{id}
     [HttpPost]
     public async Task<IActionResult> CreateBranch([FromBody] CreateSessionDto newSession)
     {
@@ -70,7 +70,7 @@ public class SessionController : ControllerBase
     //         : NotFound(result.Error);
     // }
     
-    // DELETE: api/branches/{id}
+    // DELETE: api/sessions/{id}
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteBranch([FromRoute] Guid id)
     {

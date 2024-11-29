@@ -47,4 +47,14 @@ public class MovieController : ControllerBase
             : BadRequest(result.Error);
     }
     
+    
+    // DELETE: api/movies/{id}
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteMovie(Guid id)
+    {
+        var result = await _movieService.DeleteMovie(id);
+        return result.IsSuccess
+            ? Ok(result)
+            : NotFound(result.Error);
+    }
 }

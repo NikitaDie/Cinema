@@ -87,11 +87,14 @@ public class BranchService : IBranchService
     public async Task<Result> DeleteBranch(Guid id)
     {
         var branch = await _repository.GetAll<Branch>()
+            .Include(b => b.Auditoriums)
             .FirstOrDefaultAsync(b => b.Id == id);
         
         if (branch == null)
             return Result.Failure("Branch not found.");
 
+        branch.Auditoriums.ToList().ForEach(pl => _repository.Delete(pl));
+        
         _repository.Delete(branch);
         await _repository.SaveChangesAsync();
         

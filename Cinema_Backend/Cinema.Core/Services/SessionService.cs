@@ -74,6 +74,7 @@ public class SessionService : ISessionService
     public async Task<Result> DeleteSession(Guid id)
     {
         var session = await _repository.GetAll<Session>()
+            .Include(s => s.Tickets)
             .Include(s => s.Pricelists)
             .FirstOrDefaultAsync(b => b.Id == id);
         
@@ -81,6 +82,7 @@ public class SessionService : ISessionService
             return Result.Failure<SessionDetailedDto>("Session not found.");
         
         session.Pricelists.ToList().ForEach(pl => _repository.Delete(pl));
+        session.Tickets.ToList().ForEach(pl => _repository.Delete(pl));
         
         _repository.Delete(session);
         await _repository.SaveChangesAsync();

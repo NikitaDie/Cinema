@@ -11,4 +11,5 @@ public interface IMovieService
     
     Task<Result<MovieMinimalDto>> CreateMovie(CreateMovieDto createMovieDto);
     Task<Result<MovieDetailsDto>> GetMovieDetails(Guid id);
+    Task<Result> DeleteMovie(Guid id);
 }

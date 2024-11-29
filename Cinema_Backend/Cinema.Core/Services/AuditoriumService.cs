@@ -69,12 +69,17 @@ public class AuditoriumService : IAuditoriumService
     {
         var auditorium = await _repository.GetAll<Auditorium>()
             .Include(a => a.Seats)
+                .ThenInclude(seat => seat.Tickets)
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if (auditorium == null)
             return Result.Failure<AuditoriumDetailedDto>("Auditorium not found");
         
-        auditorium.Seats.ToList().ForEach(seat => _repository.Delete(seat));
+        auditorium.Seats.ToList().ForEach(seat =>
+        {
+            seat.Tickets.ToList().ForEach(ticket => _repository.Delete(ticket));
+            _repository.Delete(seat);
+        });
         
         _repository.Delete(auditorium);
         await _repository.SaveChangesAsync();
