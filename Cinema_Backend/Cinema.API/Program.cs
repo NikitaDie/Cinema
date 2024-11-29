@@ -1,4 +1,3 @@
-using AutoMapper;
 using Cinema_Backend.Filters;
 using Cinema.Core;
 using Cinema.Core.DTOs;
@@ -8,7 +7,6 @@ using Cinema.Core.Interfaces;
 using Cinema.Core.Interfaces.Extra;
 using Cinema.Core.Services;
 using Cinema.Core.Services.Extra;
-using Cinema.Core.Validators;
 using Cinema.Core.Validators.Branch;
 using Cinema.Core.Validators.Movie;
 using Cinema.Core.Validators.Pricelist;
@@ -80,6 +78,7 @@ builder.Services.AddScoped<ValidationFilter>();
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidationFilter>();
+    options.Filters.Add<ExceptionFilter>();
 });
 
 // Turns off automatic Validation Check

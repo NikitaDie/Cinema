@@ -36,8 +36,4 @@ public class ValidationFilter : ActionFilterAttribute
         base.OnActionExecuting(context);
     }
 
-    // public override void OnActionExecuted(ActionExecutedContext context)
-    // {
-    //     throw new NotImplementedException();
-    // }
 }
