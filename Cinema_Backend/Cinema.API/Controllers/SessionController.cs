@@ -18,7 +18,7 @@ public class SessionController : ControllerBase
     
     //Get api/sessions/{id}
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetBranch([FromRoute] Guid id)
+    public async Task<IActionResult> GetSession([FromRoute] Guid id)
     {
         var result = await _sessionService.GetSession(id);
         return result.IsSuccess
@@ -28,7 +28,7 @@ public class SessionController : ControllerBase
     
     // GET: api/sessions
     [HttpGet]
-    public async Task<IActionResult> GetAllBranches(
+    public async Task<IActionResult> GetAllSessions(
         [FromQuery] DateTime? after,
         [FromQuery] DateTime? until,
         [FromQuery] Guid? auditoriumId,
@@ -56,23 +56,13 @@ public class SessionController : ControllerBase
         var result = await _sessionService.CreateSession(newSession);
         var createdSessionId = result.Data?.Id;
         return result.IsSuccess
-            ? CreatedAtAction(nameof(GetBranch), new { id = createdSessionId }, result)
+            ? CreatedAtAction(nameof(GetSession), new { id = createdSessionId }, result)
             : NotFound(result.Error);
     }
     
-    // // PUT: api/branches/{id}
-    // [HttpPut("{id:guid}")]
-    // public async Task<IActionResult> UpdateBranch([FromRoute] Guid id, [FromBody] UpdateBranchDto branchToUpdate)
-    // {
-    //     var result = await _branchService.UpdateBranch(id, branchToUpdate);
-    //     return result.IsSuccess
-    //         ? Ok(result)
-    //         : NotFound(result.Error);
-    // }
-    
     // DELETE: api/sessions/{id}
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> DeleteBranch([FromRoute] Guid id)
+    public async Task<IActionResult> DeleteSession([FromRoute] Guid id)
     {
         var result = await _sessionService.DeleteSession(id);
         return result.IsSuccess

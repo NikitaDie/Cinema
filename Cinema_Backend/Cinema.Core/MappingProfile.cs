@@ -4,6 +4,7 @@ using Cinema.Core.DTOs.Auditorium;
 using Cinema.Core.DTOs.Branch;
 using Cinema.Core.DTOs.Session;
 using Cinema.Core.DTOs.Status;
+using Cinema.Core.Interfaces.Extra;
 using Cinema.Core.Models;
 
 namespace Cinema.Core;
@@ -53,25 +54,11 @@ public class MappingProfile : Profile
         CreateMap<CreateSessionDto, Session>();
         CreateMap<Session, SessionDetailedDto>();
         CreateMap<Session, SessionMinimalDto>();
-            // .ForMember(dest => dest.Pricelists, opt => opt.MapFrom((src, dest, _, context) => 
-            //     MapPricelists(src.Pricelists, src.Id)));
+          
         
         //Pricelist
         CreateMap<CreatePricelistDto, Pricelist>();
         CreateMap<Pricelist, GetPricelistDto>();
     }
     
-    private static ICollection<Pricelist> MapPricelists(
-        ICollection<CreatePricelistDto> pricelists,
-        ResolutionContext context)
-    {
-        // Resolve SessionId from parent context and map each PricelistDto to Pricelist
-        var sessionId = (Guid)context.Items["SessionId"];
-        return pricelists.Select(dto => new Pricelist
-        {
-            StatusId = dto.StatusId,
-            Price = dto.Price,
-            SessionId = sessionId
-        }).ToList();
-    }
 }

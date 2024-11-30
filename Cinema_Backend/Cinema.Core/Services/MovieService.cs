@@ -97,6 +97,7 @@ public class MovieService : IMovieService
         var movie = _mapper.Map<Movie>(createMovieDto);
         movie.Genres = genresResult.Data ?? new List<Genre>();     // Assign retrieved genres
         movie.Starring = actorsResult.Data ?? new List<Actor>();   // Assign retrieved actors
+        movie.ImagePath = _fileUploadService.GetFileUrl(uploadResult.Data!); // Assign uploaded image name
 
         // Save to repository
         await _repository.AddAsync(movie);
@@ -107,16 +108,16 @@ public class MovieService : IMovieService
 
     #region Helpers
     
-    private async Task<Result> UploadMovieImage(IFormFile image)
+    private async Task<Result<string>> UploadMovieImage(IFormFile image)
     {
         try
         {
-            await _fileUploadService.UploadFile(image);
-            return Result.Success();
+            var fileName = await _fileUploadService.UploadFile(image);
+            return Result.Success(fileName);
         }
         catch (Exception e)
         {
-            return Result.Failure($"Image upload failed: {e.Message}");
+            return Result.Failure<string>($"Image upload failed: {e.Message}");
         }
     }
     

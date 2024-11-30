@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Cinema.Core.Models.Helpers;
+﻿using Cinema.Core.Models.Helpers;
 
 namespace Cinema.Core.Models;
 

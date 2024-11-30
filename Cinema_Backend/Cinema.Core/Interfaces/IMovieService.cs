@@ -1,7 +1,5 @@
 ﻿using Cinema.Core.DTOs;
-using Cinema.Core.Helpers;
 using Cinema.Core.Helpers.UnifiedResponse;
-using Cinema.Core.Models;
 
 namespace Cinema.Core.Interfaces;
 

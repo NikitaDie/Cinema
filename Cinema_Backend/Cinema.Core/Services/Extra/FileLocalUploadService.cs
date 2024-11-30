@@ -27,7 +27,7 @@ public class FileLocalUploadService : IFileUploadService
         return uniqueFileName;
     }
     
-    public async Task UploadFile(IFormFile file)
+    public async Task<string> UploadFile(IFormFile file)
     {
         ValidateFile(file);
 
@@ -44,7 +44,8 @@ public class FileLocalUploadService : IFileUploadService
 
         await using var stream = new FileStream(filePath, FileMode.Create);
         await file.CopyToAsync(stream);
-        //return actual file name
+        
+        return uniqueFileName;
     }
     
     public string GetFileUrl(string fileName)
